@@ -25,15 +25,24 @@
     .btn-primary { background: #2e7d32; color: white; }
     .btn-secondary { background: #eceff1; color: #37474f; }
     .btn-success { background: #388e3c; color: white; }
+    .btn-block { width: 100%; margin-top: 10px; border: 1px solid #cfd8dc; }
     .hidden { display: none !important; }
     .step-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
     .step-number { width: 32px; min-width: 32px; height: 42px; background: #e8f5e9; color: #2e7d32; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: bold; }
     .step-row textarea { flex: 1; }
     .remove-step { width: 40px; height: 42px; padding: 0; background: #ffebee; color: #c62828; font-size: 18px; }
-    .task-item { border: 1px solid #e0e0e0; border-radius: 9px; padding: 15px; margin-bottom: 12px; background: #fafafa; }
-    .task-title { font-weight: bold; color: #1b5e20; margin-bottom: 8px; }
+    
+    /* Updated Task List Styles */
+    .task-item { border: 1px solid #e0e0e0; border-radius: 9px; padding: 10px 15px; margin-bottom: 12px; background: #fafafa; }
+    .task-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+    .task-header:hover .task-title { color: #2e7d32; text-decoration: underline; }
+    .task-title { font-weight: bold; color: #1b5e20; margin-bottom: 4px; }
     .task-status { display: inline-block; padding: 4px 9px; border-radius: 20px; background: #e8f5e9; color: #2e7d32; font-size: 12px; font-weight: bold; }
-    .task-steps { margin-top: 10px; padding-left: 20px; color: #455a64; font-size: 14px; line-height: 1.6; }
+    .task-steps-container { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cfd8dc; }
+    .task-steps-container.expanded { display: block; }
+    .task-steps { color: #455a64; font-size: 14px; line-height: 1.6; padding-left: 10px; }
+    .toggle-icon { font-size: 20px; color: #607d8b; font-weight: bold; }
+    
     .empty-message { color: #78909c; font-size: 14px; text-align: center; padding: 15px; }
     .action-area { padding-top: 10px; border-top: 1px solid #eeeeee; margin-top: 20px; }
     .message { padding: 12px 15px; border-radius: 7px; margin-bottom: 15px; display: none; font-size: 14px; }
@@ -71,7 +80,10 @@
 
   <div class="card hidden" id="previousTasksCard">
     <h2>2. Your Registered Tasks</h2>
-    <div id="previousTasks"><div class="loading">Loading...</div></div>
+    <button type="button" class="btn-secondary btn-block hidden" id="toggleTaskListBtn" onclick="toggleTaskList()">Show Registered Tasks</button>
+    <div id="previousTasksContainer" class="hidden">
+      <div id="previousTasks"><div class="loading">Loading...</div></div>
+    </div>
   </div>
 
   <div class="card hidden" id="taskCard">
@@ -166,23 +178,69 @@
       { action: "getEmployeeTasks", empId: employee.empId },
       function(tasks) {
         const container = document.getElementById("previousTasks");
+        const listContainer = document.getElementById("previousTasksContainer");
+        const toggleBtn = document.getElementById("toggleTaskListBtn");
+
         if (!tasks || tasks.length === 0) {
           container.innerHTML = '<div class="empty-message">No task has been registered yet.</div>';
+          toggleBtn.classList.add("hidden");
+          listContainer.classList.remove("hidden");
           return;
         }
+
+        // Show toggle button, hide list by default
+        toggleBtn.classList.remove("hidden");
+        toggleBtn.innerText = "Show Registered Tasks (" + tasks.length + ")";
+        listContainer.classList.add("hidden");
+
         let html = "";
-        tasks.forEach(function(task) {
+        tasks.forEach(function(task, index) {
           html += `
             <div class="task-item">
-              <div class="task-title">${escapeHtml(task.taskName)}</div>
-              <span class="task-status">${escapeHtml(task.status || "Completed")}</span>
-              <div class="task-steps">${formatSteps(task.steps)}</div>
+              <div class="task-header" onclick="toggleTaskDetails(${index})">
+                <div>
+                  <div class="task-title">${escapeHtml(task.taskName)}</div>
+                  <span class="task-status">${escapeHtml(task.status || "Completed")}</span>
+                </div>
+                <div class="toggle-icon" id="icon-${index}">+</div>
+              </div>
+              <div class="task-steps-container" id="details-${index}">
+                <div class="task-steps">${formatSteps(task.steps)}</div>
+              </div>
             </div>`;
         });
         container.innerHTML = html;
       },
       function() {} 
     );
+  }
+
+  function toggleTaskList() {
+    const container = document.getElementById("previousTasksContainer");
+    const btn = document.getElementById("toggleTaskListBtn");
+    
+    if (container.classList.contains("hidden")) {
+      container.classList.remove("hidden");
+      btn.innerText = "Hide Registered Tasks";
+    } else {
+      container.classList.add("hidden");
+      // Extract count from current list to maintain numeric label
+      const taskCount = document.querySelectorAll('.task-item').length;
+      btn.innerText = "Show Registered Tasks (" + taskCount + ")";
+    }
+  }
+
+  function toggleTaskDetails(index) {
+    const details = document.getElementById("details-" + index);
+    const icon = document.getElementById("icon-" + index);
+    
+    if (details.classList.contains("expanded")) {
+      details.classList.remove("expanded");
+      icon.innerText = "+";
+    } else {
+      details.classList.add("expanded");
+      icon.innerText = "−";
+    }
   }
 
   function initializeSteps() {
