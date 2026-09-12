@@ -1,135 +1,201 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <base target="_top">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Task SOP Collector</title>
+  <title>Task SOP Collector - Enterprise</title>
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: Arial, sans-serif; background: #f5f7fa; color: #263238; }
-    .container { max-width: 900px; margin: 30px auto; padding: 20px; }
-    .header { background: #ffffff; padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); text-align: center; }
-    .header h1 { margin: 0 0 8px; font-size: 26px; color: #1b5e20; }
-    .header p { margin: 0; color: #607d8b; font-size: 14px; }
-    .card { background: #ffffff; padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); }
-    .card h2 { margin-top: 0; font-size: 19px; color: #37474f; }
-    label { display: block; font-weight: bold; margin-bottom: 7px; font-size: 14px; }
-    input, textarea { width: 100%; padding: 12px; border: 1px solid #cfd8dc; border-radius: 7px; font-size: 14px; outline: none; }
-    input:focus, textarea:focus { border-color: #2e7d32; }
-    textarea { min-height: 75px; resize: vertical; }
-    .form-group { margin-bottom: 18px; }
-    .employee-info { display: none; background: #f1f8e9; border-left: 5px solid #43a047; padding: 15px; border-radius: 7px; margin-top: 15px; }
-    .employee-info div { margin: 5px 0; font-size: 14px; }
-    .employee-info strong { display: inline-block; min-width: 100px; }
-    button { border: none; border-radius: 7px; padding: 11px 18px; font-size: 14px; font-weight: bold; cursor: pointer; margin-right: 7px; margin-bottom: 7px; }
-    .btn-primary { background: #2e7d32; color: white; }
-    .btn-secondary { background: #eceff1; color: #37474f; }
-    .btn-success { background: #388e3c; color: white; }
-    .btn-block { width: 100%; margin-top: 10px; border: 1px solid #cfd8dc; }
-    .hidden { display: none !important; }
-    .step-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
-    .step-number { width: 32px; min-width: 32px; height: 42px; background: #e8f5e9; color: #2e7d32; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: bold; }
-    .step-row textarea { flex: 1; }
-    .remove-step { width: 40px; height: 42px; padding: 0; background: #ffebee; color: #c62828; font-size: 18px; }
+    :root {
+      --primary-color: #1e293b; /* Slate 800 */
+      --accent-color: #2563eb; /* Blue 600 */
+      --accent-hover: #1d4ed8; /* Blue 700 */
+      --bg-color: #f1f5f9; /* Slate 100 */
+      --panel-bg: #ffffff;
+      --border-color: #cbd5e1; /* Slate 300 */
+      --text-main: #0f172a; /* Slate 900 */
+      --text-muted: #475569; /* Slate 600 */
+      --success: #059669; /* Emerald 600 */
+      --danger: #dc2626; /* Red 600 */
+      --radius: 4px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.5; font-size: 14px; }
     
-    /* Updated Task List Styles */
-    .task-item { border: 1px solid #e0e0e0; border-radius: 9px; padding: 10px 15px; margin-bottom: 12px; background: #fafafa; }
-    .task-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-    .task-header:hover .task-title { color: #2e7d32; text-decoration: underline; }
-    .task-title { font-weight: bold; color: #1b5e20; margin-bottom: 4px; }
-    .task-status { display: inline-block; padding: 4px 9px; border-radius: 20px; background: #e8f5e9; color: #2e7d32; font-size: 12px; font-weight: bold; }
-    .task-steps-container { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cfd8dc; }
+    /* Top Navigation */
+    .navbar { background-color: var(--panel-bg); border-bottom: 1px solid var(--border-color); padding: 16px 32px; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .navbar h1 { font-size: 18px; font-weight: 600; color: var(--primary-color); letter-spacing: 0.5px; }
+    .navbar span { margin-left: 12px; padding-left: 12px; border-left: 1px solid var(--border-color); color: var(--text-muted); font-size: 13px; }
+
+    /* Main Container */
+    .container { max-width: 850px; margin: 32px auto; padding: 0 20px; }
+
+    /* Panels */
+    .panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+    .panel-header { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 20px; }
+
+    /* Typography & Forms */
+    label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--primary-color); }
+    input[type="text"], textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 14px; background: #fff; transition: border 0.2s; }
+    input:focus, textarea:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 1px var(--accent-color); }
+    textarea { min-height: 80px; resize: vertical; }
+    .form-group { margin-bottom: 20px; }
+
+    /* Buttons */
+    button { border: none; border-radius: var(--radius); padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-primary { background: var(--accent-color); color: white; border: 1px solid var(--accent-color); }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: #f8fafc; color: var(--text-main); border: 1px solid var(--border-color); }
+    .btn-secondary:hover { background: #f1f5f9; }
+    .btn-success { background: var(--success); color: white; border: 1px solid var(--success); }
+    .btn-success:hover { background: #047857; }
+    .btn-block { width: 100%; margin-top: 8px; }
+
+    /* Employee Info Box */
+    .employee-info { display: none; background: #f8fafc; border: 1px solid var(--border-color); border-left: 4px solid var(--accent-color); padding: 16px; border-radius: 0 var(--radius) var(--radius) 0; margin-top: 16px; }
+    .employee-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+    .info-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 2px; }
+    .info-value { font-size: 14px; font-weight: 600; color: var(--primary-color); }
+
+    /* Steps Layout */
+    .step-row { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+    .step-number { width: 36px; min-width: 36px; height: 38px; background: var(--bg-color); color: var(--text-muted); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; border-radius: var(--radius); font-weight: 600; font-size: 13px; }
+    .step-row textarea { flex: 1; height: 38px; min-height: 38px; }
+    
+    /* Controls (Mic & Delete) */
+    .controls-group { display: flex; gap: 6px; }
+    .tool-btn { width: 38px; height: 38px; padding: 0; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .tool-btn:hover { background: #e2e8f0; color: var(--text-main); }
+    .tool-btn.recording { background: #fee2e2; color: var(--danger); border-color: #fca5a5; }
+
+    /* Task List */
+    .task-item { border: 1px solid var(--border-color); border-radius: var(--radius); margin-bottom: 8px; background: var(--panel-bg); }
+    .task-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: pointer; background: #f8fafc; border-radius: var(--radius); }
+    .task-header:hover { background: #f1f5f9; }
+    .task-title { font-weight: 600; color: var(--primary-color); font-size: 14px; }
+    .task-status { display: inline-block; padding: 2px 8px; border-radius: 12px; background: #d1fae5; color: var(--success); font-size: 11px; font-weight: 600; text-transform: uppercase; margin-top: 4px; border: 1px solid #a7f3d0; }
+    .task-steps-container { display: none; padding: 16px; border-top: 1px solid var(--border-color); }
     .task-steps-container.expanded { display: block; }
-    .task-steps { color: #455a64; font-size: 14px; line-height: 1.6; padding-left: 10px; }
-    .toggle-icon { font-size: 20px; color: #607d8b; font-weight: bold; }
+    .task-steps { color: var(--text-main); font-size: 13px; line-height: 1.6; padding-left: 8px; }
     
-    .empty-message { color: #78909c; font-size: 14px; text-align: center; padding: 15px; }
-    .action-area { padding-top: 10px; border-top: 1px solid #eeeeee; margin-top: 20px; }
-    .message { padding: 12px 15px; border-radius: 7px; margin-bottom: 15px; display: none; font-size: 14px; }
-    .message.success { background: #e8f5e9; color: #2e7d32; }
-    .message.error { background: #ffebee; color: #c62828; }
-    .loading { text-align: center; padding: 15px; color: #607d8b; }
-    .final-box { background: #fff8e1; border-left: 5px solid #f9a825; padding: 15px; border-radius: 7px; margin-top: 15px; font-size: 14px; }
+    /* Utilities */
+    .hidden { display: none !important; }
+    .action-area { padding-top: 16px; border-top: 1px solid var(--border-color); margin-top: 24px; display: flex; gap: 12px; }
+    .empty-message { color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px; font-style: italic; }
+    .message { padding: 12px 16px; border-radius: var(--radius); margin-bottom: 24px; display: none; font-size: 13px; font-weight: 500; border: 1px solid transparent; }
+    .message.success { background: #ecfdf5; color: var(--success); border-color: #a7f3d0; }
+    .message.error { background: #fef2f2; color: var(--danger); border-color: #fecaca; }
+    .final-box { text-align: center; padding: 40px 20px; }
+    .final-box h3 { color: var(--success); margin-bottom: 8px; }
+
+    @media (max-width: 600px) {
+      .step-row { flex-wrap: wrap; }
+      .step-row textarea { min-width: 100%; order: 3; margin-top: 4px; }
+      .step-number { order: 1; }
+      .controls-group { order: 2; margin-left: auto; }
+      .action-area { flex-direction: column; }
+    }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="header">
-    <h1>Task SOP Collector</h1>
-    <p>Document the tasks and step-by-step processes you perform regularly.</p>
-  </div>
+<div class="navbar">
+  <h1>Task SOP Collector</h1>
+  <span>Standard Operating Procedure Registry</span>
+</div>
 
+<div class="container">
   <div id="message" class="message"></div>
 
-  <div class="card">
-    <h2>1. Employee Information</h2>
+  <!-- Employee Info Panel -->
+  <div class="panel">
+    <div class="panel-header">Employee Verification</div>
     <div class="form-group">
-      <label for="empId">Employee ID</label>
-      <div style="display:flex; gap:8px;">
-        <input type="text" id="empId" placeholder="Enter your Employee ID" onkeypress="if(event.key === 'Enter') loadEmployee();">
-        <button type="button" class="btn-primary" onclick="loadEmployee()" id="loadBtn">Continue</button>
+      <label for="empId">Employee ID Number</label>
+      <div style="display:flex; gap:8px; max-width: 400px;">
+        <input type="text" id="empId" placeholder="e.g. 710003853" onkeypress="if(event.key === 'Enter') loadEmployee();">
+        <button type="button" class="btn-primary" onclick="loadEmployee()" id="loadBtn">Authenticate</button>
       </div>
     </div>
     <div id="employeeInfo" class="employee-info">
-      <div><strong>Name:</strong> <span id="empName"></span></div>
-      <div><strong>Department:</strong> <span id="empDepartment"></span></div>
-      <div><strong>Designation:</strong> <span id="empDesignation"></span></div>
+      <div class="employee-info-grid">
+        <div>
+          <div class="info-label">Name</div>
+          <div class="info-value" id="empName"></div>
+        </div>
+        <div>
+          <div class="info-label">Department</div>
+          <div class="info-value" id="empDepartment"></div>
+        </div>
+        <div>
+          <div class="info-label">Designation</div>
+          <div class="info-value" id="empDesignation"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="card hidden" id="previousTasksCard">
-    <h2>2. Your Registered Tasks</h2>
-    <button type="button" class="btn-secondary btn-block hidden" id="toggleTaskListBtn" onclick="toggleTaskList()">Show Registered Tasks</button>
-    <div id="previousTasksContainer" class="hidden">
-      <div id="previousTasks"><div class="loading">Loading...</div></div>
+  <!-- Previous Tasks Panel -->
+  <div class="panel hidden" id="previousTasksCard">
+    <div class="panel-header">Registered Workflows</div>
+    <button type="button" class="btn-secondary btn-block hidden" id="toggleTaskListBtn" onclick="toggleTaskList()">View Historical Records</button>
+    <div id="previousTasksContainer" class="hidden" style="margin-top: 12px;">
+      <div id="previousTasks"><div class="empty-message">Loading records...</div></div>
     </div>
   </div>
 
-  <div class="card hidden" id="taskCard">
-    <h2>3. Add a Task</h2>
+  <!-- Task Entry Panel -->
+  <div class="panel hidden" id="taskCard">
+    <div class="panel-header">New Workflow Documentation</div>
     <div class="form-group">
-      <label for="taskName">Task Name</label>
-      <input type="text" id="taskName" placeholder="Example: Leave Request Processing">
+      <label for="taskName">Process/Task Name</label>
+      <input type="text" id="taskName" placeholder="e.g. Employee Leave Processing">
     </div>
     <div class="form-group">
-      <label>Steps to Complete the Task</label>
+      <label>Procedural Steps (Click 🎤 to dictate)</label>
       <div id="stepsContainer"></div>
-      <button type="button" class="btn-secondary" onclick="addStep()">+ Add Step</button>
+      <button type="button" class="btn-secondary" onclick="addStep()" style="margin-top: 12px;">+ Add Sequential Step</button>
     </div>
     <div class="action-area">
-      <button type="button" class="btn-success" onclick="completeTask()">✓ Task Complete</button>
-      <button type="button" class="btn-secondary" onclick="clearTask()">Clear</button>
+      <button type="button" class="btn-primary" onclick="completeTask()">Submit Workflow Record</button>
+      <button type="button" class="btn-secondary" onclick="clearTask()">Reset Form</button>
     </div>
   </div>
 
-  <div class="card hidden" id="nextActionCard">
-    <h2>What would you like to do next?</h2>
-    <p style="font-size:14px;color:#607d8b;">Your task has been registered successfully.</p>
-    <button type="button" class="btn-primary" onclick="addAnotherTask()">+ Add More Task</button>
-    <button type="button" class="btn-success" onclick="finalSubmit()">✓ No More Task – Final Submit</button>
+  <!-- Post-Submit Action Panel -->
+  <div class="panel hidden" id="nextActionCard">
+    <div class="panel-header">Action Required</div>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:16px;">The workflow has been recorded securely in the system.</p>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <button type="button" class="btn-secondary" onclick="addAnotherTask()">Document Another Task</button>
+      <button type="button" class="btn-success" onclick="finalSubmit()">Finalize Session</button>
+    </div>
   </div>
 
-  <div class="card hidden" id="finalCard">
+  <!-- Final Completion Panel -->
+  <div class="panel hidden" id="finalCard">
     <div class="final-box">
-      <strong>Submission Completed</strong>
-      <p style="margin-bottom:0;">Thank you. Your task and process information has been recorded.</p>
+      <h3>Session Terminated</h3>
+      <p style="color:var(--text-muted);">All records have been synced successfully. You may close this window.</p>
     </div>
   </div>
 </div>
 
 <script>
+  // Ensure your valid Google Apps Script Web App URL is here
   const API_URL = "https://script.google.com/macros/s/AKfycbzmUn_E_NWQFrlSCB4RpQmRZ-xDPfSSeRAonGo4K93GQ2jbU4yg3NVm4azd0hacCcV_/exec";
 
   let employee = null;
   let stepCount = 0;
 
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let activeRecognition = null;
+  let activeMicId = null;
+
   async function callAPI(payload, onSuccess, onError) {
     try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify(payload)
-      });
+      const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
       const data = await response.json();
       if (data && data.error) throw new Error(data.error);
       onSuccess(data);
@@ -140,16 +206,16 @@
 
   function loadEmployee() {
     const empId = document.getElementById("empId").value.trim();
-    if (!empId) { showMessage("Please enter your Employee ID.", "error"); return; }
+    if (!empId) { showMessage("Employee ID is required.", "error"); return; }
     
     const btn = document.getElementById("loadBtn");
-    btn.disabled = true; btn.innerText = "Loading...";
+    btn.disabled = true; btn.innerText = "Authenticating...";
 
     callAPI(
       { action: "getEmployeeInfo", empId: empId },
       function(data) {
-        btn.disabled = false; btn.innerText = "Continue";
-        if (!data) { showMessage("Employee ID not found.", "error"); return; }
+        btn.disabled = false; btn.innerText = "Authenticate";
+        if (!data) { showMessage("Identity not found in directory.", "error"); return; }
         
         employee = data;
         document.getElementById("empName").innerText = data.name;
@@ -162,18 +228,16 @@
         
         loadPreviousTasks();
         initializeSteps();
-        showMessage("Employee verified successfully.", "success");
       },
       function() {
-        btn.disabled = false; btn.innerText = "Continue";
-        showMessage("Unable to load employee information.", "error");
+        btn.disabled = false; btn.innerText = "Authenticate";
+        showMessage("Connection error. Please try again.", "error");
       }
     );
   }
 
   function loadPreviousTasks() {
     if (!employee) return;
-    
     callAPI(
       { action: "getEmployeeTasks", empId: employee.empId },
       function(tasks) {
@@ -182,15 +246,14 @@
         const toggleBtn = document.getElementById("toggleTaskListBtn");
 
         if (!tasks || tasks.length === 0) {
-          container.innerHTML = '<div class="empty-message">No task has been registered yet.</div>';
+          container.innerHTML = '<div class="empty-message">No historical records found for this ID.</div>';
           toggleBtn.classList.add("hidden");
           listContainer.classList.remove("hidden");
           return;
         }
 
-        // Show toggle button, hide list by default
         toggleBtn.classList.remove("hidden");
-        toggleBtn.innerText = "Show Registered Tasks (" + tasks.length + ")";
+        toggleBtn.innerText = "View Historical Records (" + tasks.length + ")";
         listContainer.classList.add("hidden");
 
         let html = "";
@@ -200,9 +263,9 @@
               <div class="task-header" onclick="toggleTaskDetails(${index})">
                 <div>
                   <div class="task-title">${escapeHtml(task.taskName)}</div>
-                  <span class="task-status">${escapeHtml(task.status || "Completed")}</span>
+                  <div class="task-status">${escapeHtml(task.status || "Recorded")}</div>
                 </div>
-                <div class="toggle-icon" id="icon-${index}">+</div>
+                <div style="color:var(--text-muted); font-size:12px;">▼</div>
               </div>
               <div class="task-steps-container" id="details-${index}">
                 <div class="task-steps">${formatSteps(task.steps)}</div>
@@ -221,25 +284,20 @@
     
     if (container.classList.contains("hidden")) {
       container.classList.remove("hidden");
-      btn.innerText = "Hide Registered Tasks";
+      btn.innerText = "Hide Historical Records";
     } else {
       container.classList.add("hidden");
-      // Extract count from current list to maintain numeric label
       const taskCount = document.querySelectorAll('.task-item').length;
-      btn.innerText = "Show Registered Tasks (" + taskCount + ")";
+      btn.innerText = "View Historical Records (" + taskCount + ")";
     }
   }
 
   function toggleTaskDetails(index) {
     const details = document.getElementById("details-" + index);
-    const icon = document.getElementById("icon-" + index);
-    
     if (details.classList.contains("expanded")) {
       details.classList.remove("expanded");
-      icon.innerText = "+";
     } else {
       details.classList.add("expanded");
-      icon.innerText = "−";
     }
   }
 
@@ -255,15 +313,24 @@
     const row = document.createElement("div");
     row.className = "step-row";
     row.id = "step-" + stepCount;
+    
+    const hasMic = !!SpeechRecognition;
+    const micButton = hasMic ? `<button type="button" class="tool-btn" id="mic-${stepCount}" onclick="toggleDictation(${stepCount})" title="Dictate Step">🎤</button>` : '';
+    const removeButton = stepCount > 1 ? `<button type="button" class="tool-btn" onclick="removeStep(${stepCount})" title="Remove Step">✕</button>` : '';
+
     row.innerHTML = `
       <div class="step-number">${stepCount}</div>
-      <textarea class="step-input" placeholder="Describe step ${stepCount}..."></textarea>
-      ${stepCount > 1 ? `<button type="button" class="remove-step" onclick="removeStep(${stepCount})">×</button>` : `<div style="width:40px;"></div>`}
+      <textarea class="step-input" id="textarea-${stepCount}" placeholder="Detail action ${stepCount}..."></textarea>
+      <div class="controls-group">
+        ${micButton}
+        ${removeButton}
+      </div>
     `;
     container.appendChild(row);
   }
 
   function removeStep(id) {
+    if (activeMicId === id && activeRecognition) activeRecognition.stop();
     const row = document.getElementById("step-" + id);
     if (row) row.remove();
     renumberSteps();
@@ -273,23 +340,60 @@
     const rows = document.querySelectorAll(".step-row");
     rows.forEach(function(row, index) {
       row.querySelector(".step-number").innerText = index + 1;
-      row.querySelector(".step-input").placeholder = "Describe step " + (index + 1) + "...";
+      row.querySelector(".step-input").placeholder = "Detail action " + (index + 1) + "...";
     });
   }
 
+  function toggleDictation(stepId) {
+    if (!SpeechRecognition) return;
+    const micBtn = document.getElementById("mic-" + stepId);
+    const textarea = document.getElementById("textarea-" + stepId);
+
+    if (activeRecognition && activeMicId === stepId) {
+      activeRecognition.stop();
+      return;
+    }
+    if (activeRecognition) activeRecognition.stop();
+
+    activeRecognition = new SpeechRecognition();
+    activeRecognition.continuous = true;
+    activeRecognition.interimResults = true;
+    activeMicId = stepId;
+
+    let originalText = textarea.value;
+    if (originalText && !originalText.endsWith(' ')) originalText += ' ';
+
+    activeRecognition.onstart = function() { micBtn.classList.add("recording"); };
+    activeRecognition.onresult = function(event) {
+      let interimTranscript = "";
+      let finalTranscript = "";
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
+        else interimTranscript += event.results[i][0].transcript;
+      }
+      textarea.value = originalText + finalTranscript + interimTranscript;
+      if (finalTranscript !== "") originalText += finalTranscript + " ";
+    };
+    activeRecognition.onerror = function() { micBtn.classList.remove("recording"); };
+    activeRecognition.onend = function() {
+      micBtn.classList.remove("recording");
+      if (activeMicId === stepId) { activeRecognition = null; activeMicId = null; }
+    };
+    try { activeRecognition.start(); } catch (e) { console.error(e); }
+  }
+
   function completeTask() {
-    if (!employee) { showMessage("Verify ID first.", "error"); return; }
+    if (activeRecognition) activeRecognition.stop();
+    if (!employee) { showMessage("Authentication required.", "error"); return; }
     
     const taskName = document.getElementById("taskName").value.trim();
-    if (!taskName) { showMessage("Please enter the task name.", "error"); return; }
+    if (!taskName) { showMessage("Process Name is required.", "error"); return; }
 
     const textareas = document.querySelectorAll(".step-input");
     const steps = [];
-    textareas.forEach(input => {
-      if (input.value.trim()) steps.push(input.value.trim());
-    });
+    textareas.forEach(input => { if (input.value.trim()) steps.push(input.value.trim()); });
 
-    if (steps.length === 0) { showMessage("Add at least one step.", "error"); return; }
+    if (steps.length === 0) { showMessage("Minimum one step is required.", "error"); return; }
 
     const taskData = {
       empId: employee.empId,
@@ -300,21 +404,20 @@
       steps: steps
     };
 
-    const button = document.querySelector(".btn-success");
-    button.disabled = true; button.innerText = "Saving...";
+    const button = document.querySelector(".btn-primary");
+    button.disabled = true; button.innerText = "Transmitting...";
 
     callAPI(
       { action: "saveTaskEntry", taskData: taskData },
       function() {
-        button.disabled = false; button.innerText = "✓ Task Complete";
-        showMessage("Task saved successfully.", "success");
+        button.disabled = false; button.innerText = "Submit Workflow Record";
         document.getElementById("taskCard").classList.add("hidden");
         document.getElementById("nextActionCard").classList.remove("hidden");
         loadPreviousTasks();
       },
       function() {
-        button.disabled = false; button.innerText = "✓ Task Complete";
-        showMessage("Unable to save task.", "error");
+        button.disabled = false; button.innerText = "Submit Workflow Record";
+        showMessage("Transmission failed. Please retry.", "error");
       }
     );
   }
@@ -323,7 +426,7 @@
     document.getElementById("nextActionCard").classList.add("hidden");
     document.getElementById("taskCard").classList.remove("hidden");
     clearTask();
-    window.scrollTo({ top: document.getElementById("taskCard").offsetTop - 20, behavior: "smooth" });
+    window.scrollTo({ top: document.getElementById("taskCard").offsetTop - 80, behavior: "smooth" });
   }
 
   function clearTask() {
