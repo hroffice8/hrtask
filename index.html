@@ -25,7 +25,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; }
     body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.5; font-size: 14px; display: flex; height: 100vh; overflow: hidden; }
     
-    /* Layout */
     .sidebar { width: var(--sidebar-width); background: var(--primary-color); color: white; display: flex; flex-direction: column; flex-shrink: 0; }
     .sidebar-header { padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); }
     .sidebar-header h2 { font-size: 16px; font-weight: 600; letter-spacing: 0.5px; }
@@ -41,18 +40,15 @@
     .content-area { flex: 1; overflow-y: auto; padding: 32px; }
     .container { max-width: 100%; margin: 0 auto; }
 
-    /* Panels */
     .panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     .panel-header { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 20px; }
 
-    /* Typography & Forms */
     label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 13px; color: var(--primary-color); }
     input[type="text"], textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 14px; background: #fff; transition: border 0.2s; }
     input:focus, textarea:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 1px var(--accent-color); }
     textarea { min-height: 80px; resize: vertical; }
     .form-group { margin-bottom: 20px; }
 
-    /* Buttons */
     button { border: none; border-radius: var(--radius); padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; }
     .btn-primary { background: var(--accent-color); color: white; border: 1px solid var(--accent-color); }
     .btn-primary:hover { background: var(--accent-hover); }
@@ -61,11 +57,9 @@
     .btn-success { background: var(--success); color: white; border: 1px solid var(--success); }
     .btn-success:hover { background: #047857; }
 
-    /* AI Assistant */
     .ai-suggestion { background: #f5f3ff; border: 1px solid #ddd6fe; border-left: 3px solid var(--ai-color); padding: 10px 14px; border-radius: 0 var(--radius) var(--radius) 0; margin-top: 8px; font-size: 12px; color: #5b21b6; display: flex; gap: 8px; align-items: flex-start; }
     .ai-icon { font-size: 14px; }
 
-    /* Steps Layout */
     .step-wrapper { margin-bottom: 16px; border: 1px solid transparent; padding: 12px; border-radius: var(--radius); background: #f8fafc; transition: 0.2s; }
     .step-wrapper:focus-within { border-color: var(--border-color); background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
     .step-row { display: flex; gap: 12px; align-items: flex-start; }
@@ -77,7 +71,6 @@
     .tool-btn:hover { background: #e2e8f0; color: var(--text-main); }
     .tool-btn.recording { background: #fee2e2; color: var(--danger); border-color: #fca5a5; }
 
-    /* Task List */
     .task-item { border: 1px solid var(--border-color); border-radius: var(--radius); margin-bottom: 8px; background: var(--panel-bg); }
     .task-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; cursor: pointer; background: #f8fafc; border-radius: var(--radius); }
     .task-header:hover { background: #f1f5f9; }
@@ -87,7 +80,6 @@
     .task-steps-container.expanded { display: block; }
     .task-steps { color: var(--text-main); font-size: 13px; line-height: 1.6; padding-left: 8px; }
     
-    /* Utilities */
     .hidden { display: none !important; }
     .action-area { padding-top: 16px; border-top: 1px solid var(--border-color); margin-top: 24px; display: flex; gap: 12px; }
     .empty-message { color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px; font-style: italic; }
@@ -107,6 +99,7 @@
       .step-row textarea { min-width: 100%; order: 3; margin-top: 4px; }
       .step-number { order: 1; }
       .controls-group { order: 2; margin-left: auto; }
+      .content-area { padding: 16px; }
     }
   </style>
 </head>
@@ -135,7 +128,6 @@
     <div class="container">
       <div id="message" class="message"></div>
 
-      <!-- Authentication Panel -->
       <div class="panel" id="authPanel">
         <div class="panel-header">Employee Verification</div>
         <div class="form-group">
@@ -154,13 +146,11 @@
         </div>
       </div>
 
-      <!-- Historical Records Panel -->
       <div class="panel hidden" id="historyPanel">
         <div class="panel-header">Your Registered Workflows</div>
         <div id="previousTasks"><div class="empty-message">Loading records...</div></div>
       </div>
 
-      <!-- Task Entry Panel -->
       <div class="panel hidden" id="newPanel">
         <div class="panel-header">New Workflow Documentation</div>
         <div class="form-group">
@@ -178,7 +168,6 @@
         </div>
       </div>
 
-      <!-- Post-Submit Action Panel -->
       <div class="panel hidden" id="successPanel">
         <div class="panel-header">Transmission Successful</div>
         <p style="font-size:14px;color:var(--text-muted);margin-bottom:16px;">The workflow has been recorded securely.</p>
@@ -197,6 +186,7 @@
 
   let employee = null;
   let stepCount = 0;
+  let typingTimer = {};
 
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   let activeRecognition = null;
@@ -332,28 +322,44 @@
     container.appendChild(wrapper);
   }
 
-  // AI Assistant Logic (Client-side Simulation)
   function analyzeStep(id) {
-    const text = document.getElementById("textarea-" + id).value.toLowerCase();
+    const textarea = document.getElementById("textarea-" + id);
     const suggestionBox = document.getElementById("ai-suggestion-" + id);
-    let suggestion = "";
+    const currentText = textarea.value.trim();
+    
+    clearTimeout(typingTimer[id]);
 
-    if (text.includes("approv")) {
-      suggestion = "Who provides this approval? Are you using Smart Edu, Email, or hardcopy?";
-    } else if (text.includes("send") || text.includes("forward")) {
-      suggestion = "Consider specifying the recipient's role and what exact documents are attached.";
-    } else if (text.includes("form") || text.includes("document")) {
-      suggestion = "Where is this document located? Mention if a specific template is required.";
-    } else if (text.includes("check") || text.includes("verify")) {
-      suggestion = "What specific parameters or systems are you checking against?";
-    }
-
-    if (suggestion) {
-      suggestionBox.innerHTML = `<span class="ai-icon">✨</span> <span><strong>AI Helper:</strong> ${suggestion}</span>`;
-      suggestionBox.classList.remove("hidden");
-    } else {
+    if (currentText.length < 5) {
       suggestionBox.classList.add("hidden");
+      return;
     }
+
+    suggestionBox.innerHTML = `<span class="ai-icon">⏳</span> <span style="color:#94a3b8;">Analyzing context...</span>`;
+    suggestionBox.classList.remove("hidden");
+
+    typingTimer[id] = setTimeout(() => {
+      let contextText = "";
+      for (let i = 1; i < id; i++) {
+        let prevEl = document.getElementById("textarea-" + i);
+        if (prevEl && prevEl.value.trim() !== "") {
+          contextText += `Step ${i}: ${prevEl.value.trim()} | `;
+        }
+      }
+
+      callAPI(
+        { action: "analyzeStep", currentText: currentText, contextText: contextText },
+        function(data) {
+          if (data && data.suggestion) {
+            suggestionBox.innerHTML = `<span class="ai-icon">✨</span> <span><strong>AI Co-Pilot:</strong> ${escapeHtml(data.suggestion)}</span>`;
+          } else {
+            suggestionBox.classList.add("hidden");
+          }
+        },
+        function(error) {
+          suggestionBox.classList.add("hidden");
+        }
+      );
+    }, 1500);
   }
 
   function removeStep(id) {
@@ -401,7 +407,7 @@
       textarea.value = originalText + finalTranscript + interimTranscript;
       if (finalTranscript !== "") {
         originalText += finalTranscript + " ";
-        analyzeStep(stepId); // Trigger AI check on voice input
+        analyzeStep(stepId); 
       }
     };
     activeRecognition.onerror = function() { micBtn.classList.remove("recording"); };
