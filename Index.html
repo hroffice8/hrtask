@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Task SOP Collector</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f5f7fa; color: #263238; }
+    .container { max-width: 900px; margin: 30px auto; padding: 20px; }
+    .header { background: #ffffff; padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); text-align: center; }
+    .header h1 { margin: 0 0 8px; font-size: 26px; color: #1b5e20; }
+    .header p { margin: 0; color: #607d8b; font-size: 14px; }
+    .card { background: #ffffff; padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); }
+    .card h2 { margin-top: 0; font-size: 19px; color: #37474f; }
+    label { display: block; font-weight: bold; margin-bottom: 7px; font-size: 14px; }
+    input, textarea { width: 100%; padding: 12px; border: 1px solid #cfd8dc; border-radius: 7px; font-size: 14px; outline: none; }
+    input:focus, textarea:focus { border-color: #2e7d32; }
+    textarea { min-height: 75px; resize: vertical; }
+    .form-group { margin-bottom: 18px; }
+    .employee-info { display: none; background: #f1f8e9; border-left: 5px solid #43a047; padding: 15px; border-radius: 7px; margin-top: 15px; }
+    .employee-info div { margin: 5px 0; font-size: 14px; }
+    .employee-info strong { display: inline-block; min-width: 100px; }
+    button { border: none; border-radius: 7px; padding: 11px 18px; font-size: 14px; font-weight: bold; cursor: pointer; margin-right: 7px; margin-bottom: 7px; }
+    .btn-primary { background: #2e7d32; color: white; }
+    .btn-secondary { background: #eceff1; color: #37474f; }
+    .btn-success { background: #388e3c; color: white; }
+    .hidden { display: none !important; }
+    .step-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
+    .step-number { width: 32px; min-width: 32px; height: 42px; background: #e8f5e9; color: #2e7d32; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-weight: bold; }
+    .step-row textarea { flex: 1; }
+    .remove-step { width: 40px; height: 42px; padding: 0; background: #ffebee; color: #c62828; font-size: 18px; }
+    .task-item { border: 1px solid #e0e0e0; border-radius: 9px; padding: 15px; margin-bottom: 12px; background: #fafafa; }
+    .task-title { font-weight: bold; color: #1b5e20; margin-bottom: 8px; }
+    .task-status { display: inline-block; padding: 4px 9px; border-radius: 20px; background: #e8f5e9; color: #2e7d32; font-size: 12px; font-weight: bold; }
+    .task-steps { margin-top: 10px; padding-left: 20px; color: #455a64; font-size: 14px; line-height: 1.6; }
+    .empty-message { color: #78909c; font-size: 14px; text-align: center; padding: 15px; }
+    .action-area { padding-top: 10px; border-top: 1px solid #eeeeee; margin-top: 20px; }
+    .message { padding: 12px 15px; border-radius: 7px; margin-bottom: 15px; display: none; font-size: 14px; }
+    .message.success { background: #e8f5e9; color: #2e7d32; }
+    .message.error { background: #ffebee; color: #c62828; }
+    .loading { text-align: center; padding: 15px; color: #607d8b; }
+    .final-box { background: #fff8e1; border-left: 5px solid #f9a825; padding: 15px; border-radius: 7px; margin-top: 15px; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>Task SOP Collector</h1>
+    <p>Document the tasks and step-by-step processes you perform regularly.</p>
+  </div>
+
+  <div id="message" class="message"></div>
+
+  <div class="card">
+    <h2>1. Employee Information</h2>
+    <div class="form-group">
+      <label for="empId">Employee ID</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="empId" placeholder="Enter your Employee ID" onkeypress="if(event.key === 'Enter') loadEmployee();">
+        <button type="button" class="btn-primary" onclick="loadEmployee()" id="loadBtn">Continue</button>
+      </div>
+    </div>
+    <div id="employeeInfo" class="employee-info">
+      <div><strong>Name:</strong> <span id="empName"></span></div>
+      <div><strong>Department:</strong> <span id="empDepartment"></span></div>
+      <div><strong>Designation:</strong> <span id="empDesignation"></span></div>
+    </div>
+  </div>
+
+  <div class="card hidden" id="previousTasksCard">
+    <h2>2. Your Registered Tasks</h2>
+    <div id="previousTasks"><div class="loading">Loading...</div></div>
+  </div>
+
+  <div class="card hidden" id="taskCard">
+    <h2>3. Add a Task</h2>
+    <div class="form-group">
+      <label for="taskName">Task Name</label>
+      <input type="text" id="taskName" placeholder="Example: Leave Request Processing">
+    </div>
+    <div class="form-group">
+      <label>Steps to Complete the Task</label>
+      <div id="stepsContainer"></div>
+      <button type="button" class="btn-secondary" onclick="addStep()">+ Add Step</button>
+    </div>
+    <div class="action-area">
+      <button type="button" class="btn-success" onclick="completeTask()">✓ Task Complete</button>
+      <button type="button" class="btn-secondary" onclick="clearTask()">Clear</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="nextActionCard">
+    <h2>What would you like to do next?</h2>
+    <p style="font-size:14px;color:#607d8b;">Your task has been registered successfully.</p>
+    <button type="button" class="btn-primary" onclick="addAnotherTask()">+ Add More Task</button>
+    <button type="button" class="btn-success" onclick="finalSubmit()">✓ No More Task – Final Submit</button>
+  </div>
+
+  <div class="card hidden" id="finalCard">
+    <div class="final-box">
+      <strong>Submission Completed</strong>
+      <p style="margin-bottom:0;">Thank you. Your task and process information has been recorded.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbzmUn_E_NWQFrlSCB4RpQmRZ-xDPfSSeRAonGo4K93GQ2jbU4yg3NVm4azd0hacCcV_/exec";
+
+  let employee = null;
+  let stepCount = 0;
+
+  async function callAPI(payload, onSuccess, onError) {
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      if (data && data.error) throw new Error(data.error);
+      onSuccess(data);
+    } catch (error) {
+      onError(error);
+    }
+  }
+
+  function loadEmployee() {
+    const empId = document.getElementById("empId").value.trim();
+    if (!empId) { showMessage("Please enter your Employee ID.", "error"); return; }
+    
+    const btn = document.getElementById("loadBtn");
+    btn.disabled = true; btn.innerText = "Loading...";
+
+    callAPI(
+      { action: "getEmployeeInfo", empId: empId },
+      function(data) {
+        btn.disabled = false; btn.innerText = "Continue";
+        if (!data) { showMessage("Employee ID not found.", "error"); return; }
+        
+        employee = data;
+        document.getElementById("empName").innerText = data.name;
+        document.getElementById("empDepartment").innerText = data.department;
+        document.getElementById("empDesignation").innerText = data.designation;
+        
+        document.getElementById("employeeInfo").style.display = "block";
+        document.getElementById("previousTasksCard").classList.remove("hidden");
+        document.getElementById("taskCard").classList.remove("hidden");
+        
+        loadPreviousTasks();
+        initializeSteps();
+        showMessage("Employee verified successfully.", "success");
+      },
+      function() {
+        btn.disabled = false; btn.innerText = "Continue";
+        showMessage("Unable to load employee information.", "error");
+      }
+    );
+  }
+
+  function loadPreviousTasks() {
+    if (!employee) return;
+    
+    callAPI(
+      { action: "getEmployeeTasks", empId: employee.empId },
+      function(tasks) {
+        const container = document.getElementById("previousTasks");
+        if (!tasks || tasks.length === 0) {
+          container.innerHTML = '<div class="empty-message">No task has been registered yet.</div>';
+          return;
+        }
+        let html = "";
+        tasks.forEach(function(task) {
+          html += `
+            <div class="task-item">
+              <div class="task-title">${escapeHtml(task.taskName)}</div>
+              <span class="task-status">${escapeHtml(task.status || "Completed")}</span>
+              <div class="task-steps">${formatSteps(task.steps)}</div>
+            </div>`;
+        });
+        container.innerHTML = html;
+      },
+      function() {} 
+    );
+  }
+
+  function initializeSteps() {
+    document.getElementById("stepsContainer").innerHTML = "";
+    stepCount = 0;
+    addStep();
+  }
+
+  function addStep() {
+    stepCount++;
+    const container = document.getElementById("stepsContainer");
+    const row = document.createElement("div");
+    row.className = "step-row";
+    row.id = "step-" + stepCount;
+    row.innerHTML = `
+      <div class="step-number">${stepCount}</div>
+      <textarea class="step-input" placeholder="Describe step ${stepCount}..."></textarea>
+      ${stepCount > 1 ? `<button type="button" class="remove-step" onclick="removeStep(${stepCount})">×</button>` : `<div style="width:40px;"></div>`}
+    `;
+    container.appendChild(row);
+  }
+
+  function removeStep(id) {
+    const row = document.getElementById("step-" + id);
+    if (row) row.remove();
+    renumberSteps();
+  }
+
+  function renumberSteps() {
+    const rows = document.querySelectorAll(".step-row");
+    rows.forEach(function(row, index) {
+      row.querySelector(".step-number").innerText = index + 1;
+      row.querySelector(".step-input").placeholder = "Describe step " + (index + 1) + "...";
+    });
+  }
+
+  function completeTask() {
+    if (!employee) { showMessage("Verify ID first.", "error"); return; }
+    
+    const taskName = document.getElementById("taskName").value.trim();
+    if (!taskName) { showMessage("Please enter the task name.", "error"); return; }
+
+    const textareas = document.querySelectorAll(".step-input");
+    const steps = [];
+    textareas.forEach(input => {
+      if (input.value.trim()) steps.push(input.value.trim());
+    });
+
+    if (steps.length === 0) { showMessage("Add at least one step.", "error"); return; }
+
+    const taskData = {
+      empId: employee.empId,
+      empName: employee.name,
+      department: employee.department,
+      designation: employee.designation,
+      taskName: taskName,
+      steps: steps
+    };
+
+    const button = document.querySelector(".btn-success");
+    button.disabled = true; button.innerText = "Saving...";
+
+    callAPI(
+      { action: "saveTaskEntry", taskData: taskData },
+      function() {
+        button.disabled = false; button.innerText = "✓ Task Complete";
+        showMessage("Task saved successfully.", "success");
+        document.getElementById("taskCard").classList.add("hidden");
+        document.getElementById("nextActionCard").classList.remove("hidden");
+        loadPreviousTasks();
+      },
+      function() {
+        button.disabled = false; button.innerText = "✓ Task Complete";
+        showMessage("Unable to save task.", "error");
+      }
+    );
+  }
+
+  function addAnotherTask() {
+    document.getElementById("nextActionCard").classList.add("hidden");
+    document.getElementById("taskCard").classList.remove("hidden");
+    clearTask();
+    window.scrollTo({ top: document.getElementById("taskCard").offsetTop - 20, behavior: "smooth" });
+  }
+
+  function clearTask() {
+    document.getElementById("taskName").value = "";
+    initializeSteps();
+  }
+
+  function finalSubmit() {
+    document.getElementById("nextActionCard").classList.add("hidden");
+    document.getElementById("taskCard").classList.add("hidden");
+    document.getElementById("finalCard").classList.remove("hidden");
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  }
+
+  function showMessage(text, type) {
+    const message = document.getElementById("message");
+    message.innerText = text;
+    message.className = "message " + type;
+    message.style.display = "block";
+    setTimeout(() => { message.style.display = "none"; }, 4000);
+  }
+
+  function escapeHtml(value) {
+    if (!value) return "";
+    return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+  }
+
+  function formatSteps(steps) {
+    if (!steps) return "";
+    return escapeHtml(steps).replace(/\n/g, "<br>");
+  }
+</script>
+</body>
+</html>
