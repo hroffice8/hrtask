@@ -7,16 +7,16 @@
   <title>Task SOP Collector - Enterprise</title>
   <style>
     :root {
-      --primary-color: #1e293b; /* Slate 800 */
-      --accent-color: #2563eb; /* Blue 600 */
-      --accent-hover: #1d4ed8; /* Blue 700 */
-      --bg-color: #f1f5f9; /* Slate 100 */
+      --primary-color: #1e293b; 
+      --accent-color: #2563eb; 
+      --accent-hover: #1d4ed8; 
+      --bg-color: #f1f5f9; 
       --panel-bg: #ffffff;
-      --border-color: #cbd5e1; /* Slate 300 */
-      --text-main: #0f172a; /* Slate 900 */
-      --text-muted: #475569; /* Slate 600 */
-      --success: #059669; /* Emerald 600 */
-      --danger: #dc2626; /* Red 600 */
+      --border-color: #cbd5e1; 
+      --text-main: #0f172a; 
+      --text-muted: #475569; 
+      --success: #059669; 
+      --danger: #dc2626; 
       --radius: 4px;
     }
 
@@ -28,8 +28,8 @@
     .navbar h1 { font-size: 18px; font-weight: 600; color: var(--primary-color); letter-spacing: 0.5px; }
     .navbar span { margin-left: 12px; padding-left: 12px; border-left: 1px solid var(--border-color); color: var(--text-muted); font-size: 13px; }
 
-    /* Main Container */
-    .container { max-width: 850px; margin: 32px auto; padding: 0 20px; }
+    /* Main Container - Updated for Full Screen */
+    .container { max-width: 100%; margin: 32px auto; padding: 0 32px; }
 
     /* Panels */
     .panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
@@ -90,6 +90,7 @@
     .final-box h3 { color: var(--success); margin-bottom: 8px; }
 
     @media (max-width: 600px) {
+      .container { padding: 0 16px; }
       .step-row { flex-wrap: wrap; }
       .step-row textarea { min-width: 100%; order: 3; margin-top: 4px; }
       .step-number { order: 1; }
@@ -183,7 +184,6 @@
 </div>
 
 <script>
-  // Ensure your valid Google Apps Script Web App URL is here
   const API_URL = "https://script.google.com/macros/s/AKfycbzmUn_E_NWQFrlSCB4RpQmRZ-xDPfSSeRAonGo4K93GQ2jbU4yg3NVm4azd0hacCcV_/exec";
 
   let employee = null;
