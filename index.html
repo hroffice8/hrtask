@@ -17,7 +17,6 @@
       --text-muted: #64748b; 
       --success: #059669; 
       --danger: #dc2626; 
-      --ai-color: #8b5cf6;
       --sidebar-width: 260px;
       --radius: 6px;
     }
@@ -56,9 +55,6 @@
     .btn-secondary:hover { background: #f1f5f9; }
     .btn-success { background: var(--success); color: white; border: 1px solid var(--success); }
     .btn-success:hover { background: #047857; }
-
-    .ai-suggestion { background: #f5f3ff; border: 1px solid #ddd6fe; border-left: 3px solid var(--ai-color); padding: 10px 14px; border-radius: 0 var(--radius) var(--radius) 0; margin-top: 8px; font-size: 12px; color: #5b21b6; display: flex; gap: 8px; align-items: flex-start; }
-    .ai-icon { font-size: 14px; }
 
     .step-wrapper { margin-bottom: 16px; border: 1px solid transparent; padding: 12px; border-radius: var(--radius); background: #f8fafc; transition: 0.2s; }
     .step-wrapper:focus-within { border-color: var(--border-color); background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
@@ -158,7 +154,7 @@
           <input type="text" id="taskName" placeholder="e.g. Employee Leave Processing">
         </div>
         <div class="form-group">
-          <label>Procedural Steps (AI validation active)</label>
+          <label>Procedural Steps (Click 🎤 to dictate)</label>
           <div id="stepsContainer"></div>
           <button type="button" class="btn-secondary" onclick="addStep()" style="margin-top: 12px;">+ Add Sequential Step</button>
         </div>
@@ -182,11 +178,11 @@
 </main>
 
 <script>
+  // Ensure your valid Google Apps Script Web App URL is here
   const API_URL = "https://script.google.com/macros/s/AKfycbzmUn_E_NWQFrlSCB4RpQmRZ-xDPfSSeRAonGo4K93GQ2jbU4yg3NVm4azd0hacCcV_/exec";
 
   let employee = null;
   let stepCount = 0;
-  let typingTimer = {};
 
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   let activeRecognition = null;
@@ -311,55 +307,14 @@
     wrapper.innerHTML = `
       <div class="step-row" id="step-${stepCount}">
         <div class="step-number">${stepCount}</div>
-        <textarea class="step-input" id="textarea-${stepCount}" placeholder="Detail action ${stepCount}..." oninput="analyzeStep(${stepCount})"></textarea>
+        <textarea class="step-input" id="textarea-${stepCount}" placeholder="Detail action ${stepCount}..."></textarea>
         <div class="controls-group">
           ${micButton}
           ${removeButton}
         </div>
       </div>
-      <div id="ai-suggestion-${stepCount}" class="ai-suggestion hidden"></div>
     `;
     container.appendChild(wrapper);
-  }
-
-  function analyzeStep(id) {
-    const textarea = document.getElementById("textarea-" + id);
-    const suggestionBox = document.getElementById("ai-suggestion-" + id);
-    const currentText = textarea.value.trim();
-    
-    clearTimeout(typingTimer[id]);
-
-    if (currentText.length < 5) {
-      suggestionBox.classList.add("hidden");
-      return;
-    }
-
-    suggestionBox.innerHTML = `<span class="ai-icon">⏳</span> <span style="color:#94a3b8;">Analyzing context...</span>`;
-    suggestionBox.classList.remove("hidden");
-
-    typingTimer[id] = setTimeout(() => {
-      let contextText = "";
-      for (let i = 1; i < id; i++) {
-        let prevEl = document.getElementById("textarea-" + i);
-        if (prevEl && prevEl.value.trim() !== "") {
-          contextText += `Step ${i}: ${prevEl.value.trim()} | `;
-        }
-      }
-
-      callAPI(
-        { action: "analyzeStep", currentText: currentText, contextText: contextText },
-        function(data) {
-          if (data && data.suggestion) {
-            suggestionBox.innerHTML = `<span class="ai-icon">✨</span> <span><strong>AI Co-Pilot:</strong> ${escapeHtml(data.suggestion)}</span>`;
-          } else {
-            suggestionBox.classList.add("hidden");
-          }
-        },
-        function(error) {
-          suggestionBox.classList.add("hidden");
-        }
-      );
-    }, 1500);
   }
 
   function removeStep(id) {
@@ -405,10 +360,6 @@
         else interimTranscript += event.results[i][0].transcript;
       }
       textarea.value = originalText + finalTranscript + interimTranscript;
-      if (finalTranscript !== "") {
-        originalText += finalTranscript + " ";
-        analyzeStep(stepId); 
-      }
     };
     activeRecognition.onerror = function() { micBtn.classList.remove("recording"); };
     activeRecognition.onend = function() {
